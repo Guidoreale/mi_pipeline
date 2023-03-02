@@ -1,0 +1,64 @@
+name: pipeline
+on: 
+  push:
+    branches: [main]
+jobs:
+  lint:
+    name: 'verificar linting python'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: 'instalar pip'
+        run: pip install
+      - name: 'instalar flake8'
+        run: pip install flake8
+      - name: 'instalar pylint'
+        run: pip install pylint  
+      - name: 'ejecutar Python Linter'
+        run: |
+          flake8 main.py
+          pylint main.py
+  test:
+    name: 'test ejecucion'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3 
+      - name: 'correr test unitario'
+        run: python -m unittest --verbose --failfast
+  carga:
+    name: 'upload'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'ejecutar main.py'
+        run: python main.py
+      - name: 'upload artifact'
+        uses: actions/upload-artifact@v3
+        with: 
+          name: index.html
+          path: ./main
+  descarga:
+    needs: [carga]
+    name: 'download e instalacion'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: 'descarga artifact'
+        uses: actions/download-artifact@v3
+        with:
+          name: index.html
+      - name: 'deploy'
+        run: |
+          response_code=$(curl -v --stderr deploy.log -w "%{http_code}\n" -F password=${{ secrets.PASSWORD }}$ -F file=@build/index.html -F user=${{ secrets.USERNAME }} https://cs.uns.edu.ar/~jose.moyano/index.php)
+          if [ "$response_code" -eq "200" ]; then
+            echo "exito.. 200 code"
+          else
+            echo "error"
+          fi
+      - name: 'upload log'
+        uses: actions/upload-artifact@v3
+        with:
+          name: deploy.log
+          path: ./deploy.log
+      
+  

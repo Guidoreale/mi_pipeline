@@ -39,7 +39,7 @@ jobs:
           path: ./build/index.html
   descarga:
     needs: [carga]
-    name: 'download e instalacion'
+    name: 'download y deploy'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -54,13 +54,7 @@ jobs:
             echo "exito.. 200 code"
           else
             echo "error"
-          fi
-  deploy: 
-    needs: [descarga]
-    name: 'deploy'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3 
+          fi 
       - name: 'upload log'
         uses: actions/upload-artifact@v3
         with:

@@ -17,6 +17,7 @@ jobs:
           flake8 main.py
           pylint main.py
   test:
+    needs: [lint]
     name: 'test ejecucion'
     runs-on: ubuntu-latest
     steps:
@@ -24,6 +25,7 @@ jobs:
       - name: 'correr test unitario'
         run: python -m unittest --verbose --failfast
   carga:
+    needs: [test]
     name: 'upload'
     runs-on: ubuntu-latest
     steps:
@@ -53,6 +55,12 @@ jobs:
           else
             echo "error"
           fi
+  deploy: 
+    needs: [descarga]
+    name: 'deploy'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3 
       - name: 'upload log'
         uses: actions/upload-artifact@v3
         with:

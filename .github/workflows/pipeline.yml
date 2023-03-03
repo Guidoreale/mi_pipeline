@@ -34,7 +34,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with: 
           name: index.html
-          path: ./main
+          path: ./build/index.html
   descarga:
     needs: [carga]
     name: 'download e instalacion'
